@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.5.57">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ex5</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="ex5_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ex5_files/libs/quarto-html/quarto.js"></script>
+<script src="ex5_files/libs/quarto-html/popper.min.js"></script>
+<script src="ex5_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="ex5_files/libs/quarto-html/anchor.min.js"></script>
+<link href="ex5_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ex5_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="ex5_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="ex5_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="ex5_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">ex5</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="challenge-1-sampling-movies" class="level1">
+<h1>Challenge 1: Sampling Movies</h1>
+<p>For this first challenge we will be conducting statistics on the run-time of minutes for movies made between 1920 to 1979</p>
+<section id="step-1-load-in-libraries-and-data" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-load-in-libraries-and-data">Step 1: Load in Libraries and Data</h3>
+<p>For this challenge, we will be using functions from the {tidyverse} and {mosaic} packages, so we will load them in now along with the IMDB-movies dataset</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mosaic)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/difiore/ada-datasets/main/IMDB-movies.csv"</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(f)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "tconst"         "titleType"      "primaryTitle"   "startYear"     
+ [5] "runtimeMinutes" "genres"         "averageRating"  "numVotes"      
+ [9] "nconst"         "director"      </code></pre>
+</div>
+</div>
+</section>
+<section id="step-2-filter-movies-based-on-length-and-release-year" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-filter-movies-based-on-length-and-release-year">Step 2: Filter Movies Based on Length and Release Year</h3>
+<p>Next we need to narrow down our list of movies. We will do this by calling the filter function to select movies with startYear values of 1920-1979 and then filter based on runtimeMinutes for movies which are 60 to 180 minutes (1 to 3 hours). After that, we want to assign a decade designation to each movie. We will be this by using the case_when() function within the mutate() function. The case_when() function will assign movies a specific decade designation based on when they were released. As a result, we get a dataset (d2) with 5,651 movies</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>d2 <span class="ot">&lt;-</span> d <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(startYear <span class="sc">&gt;=</span> <span class="dv">1920</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1979</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(runtimeMinutes <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> runtimeMinutes <span class="sc">&lt;=</span> <span class="dv">180</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">decade =</span> <span class="fu">case_when</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    startYear <span class="sc">&gt;=</span> <span class="dv">1920</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1929</span> <span class="sc">~</span> <span class="st">"20s"</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    startYear <span class="sc">&gt;=</span> <span class="dv">1930</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1939</span> <span class="sc">~</span> <span class="st">"30s"</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    startYear <span class="sc">&gt;=</span> <span class="dv">1940</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1949</span> <span class="sc">~</span> <span class="st">"40s"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    startYear <span class="sc">&gt;=</span> <span class="dv">1950</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1959</span> <span class="sc">~</span> <span class="st">"50s"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    startYear <span class="sc">&gt;=</span> <span class="dv">1960</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1969</span> <span class="sc">~</span> <span class="st">"60s"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    startYear <span class="sc">&gt;=</span> <span class="dv">1970</span> <span class="sc">&amp;</span> startYear <span class="sc">&lt;=</span> <span class="dv">1979</span> <span class="sc">~</span> <span class="st">"70s"</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  ))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-3-plot-histograms" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-plot-histograms">Step 3: Plot Histograms</h3>
+<p>Now we will do some initial visualization of our data. We will use ggplot() to create histograms which, using facet_wrap(), will show the distribution of runtimeMinutes for each decade.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> d2, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> runtimeMinutes)) <span class="sc">+</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(decade))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-calculate-population-mean-and-standard-deviation" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-calculate-population-mean-and-standard-deviation">Step 4: Calculate Population Mean and Standard Deviation</h3>
+<p>For later comparison, we will measure the mean and standard deviation for runtimeMinutes per decade and save it in a data frame called “results”. This will utilize the group_by() and summarise() functions to group observations based on matching decade values before summarizing the mean and standard deviations for runtimeMinutes</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> d2 <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(decade) <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">popMean =</span> <span class="fu">mean</span>(runtimeMinutes), <span class="at">popSD =</span> <span class="fu">sd</span>(runtimeMinutes))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-5-sample-of-100-movies" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-sample-of-100-movies">Step 5: Sample of 100 Movies</h3>
+<p>Next, we will take a sample of 100 movies from each decade and calculate the mean and standard deviation of runtimeMinutes for each decade’s sample of 100 movies. Rather than rewrite the same code for each decade, I created a function which will take our d2 data set, the value of the decade to sample from, and the variable we want to measure (runtimeMinutes). The final argument is the number of samples we want to pull from the data set based on the other arguments.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>movieSamp <span class="ot">&lt;-</span> <span class="cf">function</span>(df, decadeVal, variable, num){</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, decade <span class="sc">==</span> decadeVal)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  samp <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(data, <span class="at">n =</span> num)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  sampMean <span class="ot">&lt;-</span> <span class="fu">mean</span>(samp[[variable]])</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  sampSD <span class="ot">&lt;-</span> <span class="fu">sd</span>(samp[[variable]])</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">runTimeMean =</span> sampMean, <span class="at">runTimeSD =</span> sampSD)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(data)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>d20s <span class="ot">&lt;-</span> <span class="fu">movieSamp</span>(d2, <span class="st">"20s"</span>, <span class="st">"runtimeMinutes"</span>, <span class="dv">100</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>d30s <span class="ot">&lt;-</span> <span class="fu">movieSamp</span>(d2, <span class="st">"30s"</span>, <span class="st">"runtimeMinutes"</span>, <span class="dv">100</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>d40s <span class="ot">&lt;-</span> <span class="fu">movieSamp</span>(d2, <span class="st">"40s"</span>, <span class="st">"runtimeMinutes"</span>, <span class="dv">100</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>d50s <span class="ot">&lt;-</span> <span class="fu">movieSamp</span>(d2, <span class="st">"50s"</span>, <span class="st">"runtimeMinutes"</span>, <span class="dv">100</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>d60s <span class="ot">&lt;-</span> <span class="fu">movieSamp</span>(d2, <span class="st">"60s"</span>, <span class="st">"runtimeMinutes"</span>, <span class="dv">100</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>d70s <span class="ot">&lt;-</span> <span class="fu">movieSamp</span>(d2, <span class="st">"70s"</span>, <span class="st">"runtimeMinutes"</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-6-calculate-the-standard-error-based-on-sample-population-mean" class="level3">
+<h3 class="anchored" data-anchor-id="step-6-calculate-the-standard-error-based-on-sample-population-mean">Step 6: Calculate the Standard Error Based on Sample Population Mean</h3>
+<p>Next we need to calculate the standard error of the population’s mean runtimeMinutes based on the standard deviation from our sample of 100 movies. To do this, I created another function which takes the data set we want and the standard deviation variable in the data set to calculate the standard error. I then use the mutate() function to add a third column (runTimeSE) to each decades data frame holding these metrics</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>se <span class="ot">&lt;-</span> <span class="cf">function</span>(df, sdVariable){</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  sd <span class="ot">&lt;-</span> df[[sdVariable]]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  se <span class="ot">&lt;-</span> sd<span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">100</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(se)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>d20s <span class="ot">&lt;-</span> d20s <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">runTimeSE =</span> <span class="fu">se</span>(d20s, <span class="st">"runTimeSD"</span>))</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>d30s <span class="ot">&lt;-</span> d30s <span class="sc">|&gt;</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">runTimeSE =</span> <span class="fu">se</span>(d30s, <span class="st">"runTimeSD"</span>))</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>d40s <span class="ot">&lt;-</span> d40s <span class="sc">|&gt;</span></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">runTimeSE =</span> <span class="fu">se</span>(d40s, <span class="st">"runTimeSD"</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>d50s <span class="ot">&lt;-</span> d50s <span class="sc">|&gt;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">runTimeSE =</span> <span class="fu">se</span>(d50s, <span class="st">"runTimeSD"</span>))</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>d60s <span class="ot">&lt;-</span> d60s <span class="sc">|&gt;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">runTimeSE =</span> <span class="fu">se</span>(d60s, <span class="st">"runTimeSD"</span>))</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>d70s <span class="ot">&lt;-</span> d70s <span class="sc">|&gt;</span></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">runTimeSE =</span> <span class="fu">se</span>(d70s, <span class="st">"runTimeSD"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-7-compare-estimates-of-population-runtimeminutes-with-the-sample-of-100" class="level3">
+<h3 class="anchored" data-anchor-id="step-7-compare-estimates-of-population-runtimeminutes-with-the-sample-of-100">Step 7: Compare Estimates of Population runtimeMinutes with the Sample of 100</h3>
+<p>Below is a table listing the population and sample measurements of mean and standard deviation along with the sample standard error we calculated in step 6 . The means and standard deviation of the population are fairly similar, with some variation in each decade. The standard error is low for each decade, indicating they are good estimates of the population. I used the following to calculate the population standard error: sd/sqrt(size)</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>d20se <span class="ot">&lt;-</span> <span class="fl">26.20133</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">152</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>d30se <span class="ot">&lt;-</span> <span class="fl">17.28879</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">530</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>d40se <span class="ot">&lt;-</span> <span class="fl">19.12372</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">782</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>d50se <span class="ot">&lt;-</span> <span class="fl">19.20646</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">1081</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>d60se <span class="ot">&lt;-</span> <span class="fl">21.23202</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">1386</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>d70se <span class="ot">&lt;-</span> <span class="fl">17.95934</span><span class="sc">/</span><span class="fu">sqrt</span>(<span class="dv">1720</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Decade</th>
+<th>PopMean</th>
+<th>SampleMean</th>
+<th>PopSD</th>
+<th>SampleSD</th>
+<th>PopSE</th>
+<th>SampleSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>20s</td>
+<td>96.3</td>
+<td>97.7</td>
+<td>26.2</td>
+<td>27.1</td>
+<td>2.13</td>
+<td>2.71</td>
+</tr>
+<tr class="even">
+<td>30s</td>
+<td>90.3</td>
+<td>90.5</td>
+<td>17.3</td>
+<td>18.6</td>
+<td>0.75</td>
+<td>1.86</td>
+</tr>
+<tr class="odd">
+<td>40s</td>
+<td>97.3</td>
+<td>97</td>
+<td>19.1</td>
+<td>17.6</td>
+<td>0.68</td>
+<td>1.76</td>
+</tr>
+<tr class="even">
+<td>50s</td>
+<td>98.9</td>
+<td>99.7</td>
+<td>19.2</td>
+<td>18.7</td>
+<td>0.58</td>
+<td>1.87</td>
+</tr>
+<tr class="odd">
+<td>60s</td>
+<td>105.6</td>
+<td>106</td>
+<td>21.2</td>
+<td>22.6</td>
+<td>057</td>
+<td>2.26</td>
+</tr>
+<tr class="even">
+<td>70s</td>
+<td>103.8</td>
+<td>102</td>
+<td>18.0</td>
+<td>17.2</td>
+<td>0.43</td>
+<td>1.72</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="step-8-create-sampling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="step-8-create-sampling-distribution">Step 8: Create Sampling Distribution</h3>
+<p>Now, we shall create a sampling distribution based on runtimeMinutes which will pull 1000 random samples of 100 movies from each decade without replacement. From this sample distribution we will calculate the mean and standard deviation for each sample pulled. To do this I created a function which takes the data set (d2), variable (runtimeMinutes), decade (20s, 30s, etc), sample repetitions (1000), and the number of movies to be pulled with each sample (100). I use a for() loop in this function to do each iteration of the sampling distribution. Originally, I tried using the do() function from {mosaic} but this resulted in each sample in the distribution having the same mean and standard deviation, which did not seem right haha.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sampMetricsDecade <span class="ot">&lt;-</span> <span class="cf">function</span>(df, variable, decadeVal, sampReps, sampNum){</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  data <span class="ot">&lt;-</span> <span class="fu">filter</span>(df, decade <span class="sc">==</span> decadeVal)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  sampDistMean <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(sampReps)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  sampDistSD <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(sampReps)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>sampReps){</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    sample <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(data, <span class="at">n =</span> sampNum)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    sampDistMean[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(sample[[variable]])</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    sampDistSD[i] <span class="ot">&lt;-</span> <span class="fu">sd</span>(sample[[variable]])</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Mean and standard deviation for"</span>, sampReps, <span class="st">"random samples of"</span>, sampNum, <span class="st">"survivors is in dataframe!"</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">means =</span> sampDistMean, <span class="at">standard_deviation =</span> sampDistSD))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>d20samp <span class="ot">&lt;-</span> <span class="fu">sampMetricsDecade</span>(d2, <span class="st">"runtimeMinutes"</span>, <span class="st">"20s"</span>, <span class="dv">1000</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 1000 random samples of 100 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>d30samp <span class="ot">&lt;-</span> <span class="fu">sampMetricsDecade</span>(d2, <span class="st">"runtimeMinutes"</span>, <span class="st">"30s"</span>, <span class="dv">1000</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 1000 random samples of 100 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>d40samp <span class="ot">&lt;-</span> <span class="fu">sampMetricsDecade</span>(d2, <span class="st">"runtimeMinutes"</span>, <span class="st">"40s"</span>, <span class="dv">1000</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 1000 random samples of 100 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>d50samp <span class="ot">&lt;-</span> <span class="fu">sampMetricsDecade</span>(d2, <span class="st">"runtimeMinutes"</span>, <span class="st">"50s"</span>, <span class="dv">1000</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 1000 random samples of 100 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>d60samp <span class="ot">&lt;-</span> <span class="fu">sampMetricsDecade</span>(d2, <span class="st">"runtimeMinutes"</span>, <span class="st">"60s"</span>, <span class="dv">1000</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 1000 random samples of 100 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>d70samp <span class="ot">&lt;-</span> <span class="fu">sampMetricsDecade</span>(d2, <span class="st">"runtimeMinutes"</span>, <span class="st">"70s"</span>, <span class="dv">1000</span>, <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 1000 random samples of 100 survivors is in dataframe!"</code></pre>
+</div>
+</div>
+</section>
+<section id="step-9-calculate-mean-and-standard-deviation-of-the-sampling-distribution-and-plot-sampling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="step-9-calculate-mean-and-standard-deviation-of-the-sampling-distribution-and-plot-sampling-distribution">Step 9: Calculate Mean and Standard Deviation of the Sampling Distribution and Plot Sampling Distribution</h3>
+<p>Finally in our analysis, we will calculate the mean and standard deviation of the sampling distribution we generated. I will do this by passing the mean variable though a function I made to calculate the mean and standard deviation of the sampling distributions. Then, to visualize our data, we will plot histograms of the distribution of the means in the sampling distribution. These all have a shape associated with a normal distribution.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>sampMeanSD <span class="ot">&lt;-</span> <span class="cf">function</span>(df, Meanvariable){</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  sampDistMean <span class="ot">&lt;-</span> <span class="fu">mean</span>(df[[Meanvariable]])</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  sampDistSD <span class="ot">&lt;-</span> <span class="fu">sd</span>(df[[Meanvariable]])</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Mean ="</span>, sampDistMean, <span class="st">"; SD ="</span>, sampDistSD))</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">sampleDistMean =</span> sampDistMean, <span class="at">sampleDistSD =</span> sampDistSD))</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>d20distMeanSD <span class="ot">&lt;-</span> <span class="fu">sampMeanSD</span>(d20samp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean = 96.25742 ; SD = 1.55080712738443"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>d30distMeanSD <span class="ot">&lt;-</span> <span class="fu">sampMeanSD</span>(d30samp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean = 90.37203 ; SD = 1.55974869613508"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>d40distMeanSD <span class="ot">&lt;-</span> <span class="fu">sampMeanSD</span>(d40samp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean = 97.13149 ; SD = 1.83838770373642"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>d50distMeanSD <span class="ot">&lt;-</span> <span class="fu">sampMeanSD</span>(d50samp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean = 98.96532 ; SD = 1.87278269230912"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>d60distMeanSD <span class="ot">&lt;-</span> <span class="fu">sampMeanSD</span>(d60samp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean = 105.56284 ; SD = 2.06611039069711"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>d70distMeanSD <span class="ot">&lt;-</span> <span class="fu">sampMeanSD</span>(d70samp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean = 103.76349 ; SD = 1.72744834877854"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(d20samp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(d30samp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-9-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(d40samp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-9-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(d50samp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-9-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(d60samp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-9-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(d70samp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-9-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-10-comparing-the-population-sample-and-sampling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="step-10-comparing-the-population-sample-and-sampling-distribution">Step 10: Comparing The Population, Sample, and Sampling Distribution</h3>
+<p>Below I have the standard error for each decade’s sample, population, and sample distribution. The sample distribution standard error is generally lower than the sample standard error (except for the 70s), suggesting that the sample distribution is a more accurate estimate of the population.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Decade</th>
+<th>SampleSE</th>
+<th>PopSE</th>
+<th>SampleDistSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>20s</td>
+<td>2.71</td>
+<td>2.13</td>
+<td>1.55</td>
+</tr>
+<tr class="even">
+<td>30s</td>
+<td>1.86</td>
+<td>0.75</td>
+<td>1.6</td>
+</tr>
+<tr class="odd">
+<td>40s</td>
+<td>1.76</td>
+<td>0.68</td>
+<td>1.76</td>
+</tr>
+<tr class="even">
+<td>50s</td>
+<td>1.87</td>
+<td>0.58</td>
+<td>1.81</td>
+</tr>
+<tr class="odd">
+<td>60s</td>
+<td>2.26</td>
+<td>0.57</td>
+<td>2.01</td>
+</tr>
+<tr class="even">
+<td>70s</td>
+<td>1.72</td>
+<td>0.43</td>
+<td>1.79</td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="challenge-2-sampling-zombie-survivors" class="level1">
+<h1>Challenge 2: Sampling Zombie Survivors</h1>
+<p>In this next challenge, we will analyze the quantitative measures for a group of zombie apocalypse survivors!</p>
+<section id="step-1-load-in-libraries-and-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-load-in-libraries-and-data-1">Step 1: Load in Libraries and Data</h3>
+<p>We will first load in the libraries we need for this analysis, {tidyverse}, {ggplot2}, and {mosaic}. Next we will load in the zombies.csv data set and name it “z”</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mosaic)</span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="st">"https://raw.githubusercontent.com/difiore/ada-datasets/main/zombies.csv"</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(f)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-2-initial-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-initial-metrics">Step 2: Initial Metrics</h3>
+<p>Now we will calculate the mean and standard deviation of the population for all the quantitative measure in the file (height, weight, age, number of zombies killed, and years of education). We cannot use the sd() function to calculate the standard deviation since we are looking at the whole population here. Instead we will use the equation sqrt((n-1)/n)*sd(variable) where n is the total length of the variable in the data set, which is 1000 in this case.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>MeanSDz <span class="ot">&lt;-</span> z <span class="sc">|&gt;</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(gender) <span class="sc">|&gt;</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">meanHeight =</span> <span class="fu">mean</span>(height), <span class="at">meanWeight =</span> <span class="fu">mean</span>(weight), <span class="at">meanAge =</span> <span class="fu">mean</span>(age),</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>            <span class="at">meanZKills =</span> <span class="fu">mean</span>(zombies_killed), <span class="at">meanEdYrs =</span> <span class="fu">mean</span>(years_of_education),</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdHeight =</span> <span class="fu">sqrt</span>((n <span class="sc">-</span> <span class="dv">1</span>)<span class="sc">/</span>n)<span class="sc">*</span><span class="fu">sd</span>(height), <span class="at">sdWeight =</span> <span class="fu">sqrt</span>((n<span class="dv">-1</span>)<span class="sc">/</span>n)<span class="sc">*</span><span class="fu">sd</span>(weight),</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdAge =</span> <span class="fu">sqrt</span>((n<span class="dv">-1</span>)<span class="sc">/</span>n)<span class="sc">*</span><span class="fu">sd</span>(age), <span class="at">sdZKills =</span> <span class="fu">sqrt</span>((n<span class="dv">-1</span>)<span class="sc">/</span>n)<span class="sc">*</span><span class="fu">sd</span>(zombies_killed),</span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">sdEdYrs =</span> <span class="fu">sqrt</span>((n<span class="dv">-1</span>)<span class="sc">/</span>n)<span class="sc">*</span><span class="fu">sd</span>(years_of_education))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-3-boxplots-by-gender" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-boxplots-by-gender">Step 3: Boxplots by Gender</h3>
+<p>To visualize each of these variables, we ill use ggplot() to create boxplots of each variable based on gender.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Height</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> height))<span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Height by Gender"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Weight</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> weight))<span class="sc">+</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Weight by Gender"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-12-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Age</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> age))<span class="sc">+</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Age by Gender"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-12-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Number of Zombies killed</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> zombies_killed))<span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Zombie Kills by Gender"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-12-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Years of education</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> gender, <span class="at">y =</span> years_of_education))<span class="sc">+</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Years of Education by Gender"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-12-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-4-scatterplots-of-height-and-weight-by-gender" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-scatterplots-of-height-and-weight-by-gender">Step 4: Scatterplots of Height and Weight by Gender</h3>
+<p>Now we will again use ggplot() to plot the distribution of height based on age and weight based on age by gender in scatterplots. Based on the plots, height and age seem to have a positive relationship in that as age increases height increases steadily. Weight in relation to age though seems to be a bit more randomly distributed, with some younger individual weighing more than older ones and vice-a-versa.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Height and age</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> height, <span class="at">color =</span> gender)) <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Height in relation to Age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Weight and age</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> z, <span class="at">mapping =</span> <span class="fu">aes</span>(<span class="at">x =</span> age, <span class="at">y =</span> weight, <span class="at">color =</span> gender)) <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Weight in relation to Age"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-13-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-5-create-histograms-and-qq-plots" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-create-histograms-and-qq-plots">Step 5: Create Histograms and QQ Plots</h3>
+<p>We will not use the hist() and qqnorm() functions to create histograms and QQ plots of each variable of interest. Based on these plots, height, weight and age appear to be normally distributed while number of zombie kills and years of education are not.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Height</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(z<span class="sc">$</span>height) <span class="co">#looks normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(z<span class="sc">$</span>height) <span class="co">#normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Weight</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(z<span class="sc">$</span>weight) <span class="co">#normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(z<span class="sc">$</span>weight) <span class="co">#normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Age</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(z<span class="sc">$</span>age) <span class="co">#normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(z<span class="sc">$</span>age) <span class="co">#normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Zombie Kills</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(z<span class="sc">$</span>zombies_killed) <span class="co">#not normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(z<span class="sc">$</span>zombies_killed) <span class="co">#not normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-8.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co">#Years of Education</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(z<span class="sc">$</span>years_of_education) <span class="co">#not normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-9.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(z<span class="sc">$</span>years_of_education) <span class="co">#not normal</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-14-10.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-6-50-survivor-sample" class="level3">
+<h3 class="anchored" data-anchor-id="step-6-50-survivor-sample">Step 6: 50 Survivor Sample</h3>
+<p>Now we will take a sample of 50 survivors and calculate the mean, standard deviation, standard error, and 95% confidence intervals of this sample for each variable. First we will use the slice_sample() function to create a sample data set of 50 survivors. Then we will pass this sample through a function I made which will calculate the values we want from this sample of 50.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>sampleSurvivors <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(z, <span class="at">n =</span> <span class="dv">50</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>metrics <span class="ot">&lt;-</span> <span class="cf">function</span>(data, variable, lowCIBound, highCIBound){</span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  sampMean <span class="ot">&lt;-</span> <span class="fu">mean</span>(data[[variable]])</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>  sampSD <span class="ot">&lt;-</span> <span class="fu">sd</span>(data[[variable]])</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>  sampSE <span class="ot">&lt;-</span> sampSD<span class="sc">/</span><span class="fu">sqrt</span>(<span class="fu">length</span>(data[[variable]]))</span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  sampCI <span class="ot">&lt;-</span> sampMean <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fu">c</span>(lowCIBound, highCIBound)) <span class="sc">*</span> sampSE</span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(variable, <span class="st">"mean:"</span>, sampMean))</span>
+<span id="cb58-8"><a href="#cb58-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(variable, <span class="st">"standard deviation:"</span>, sampSD))</span>
+<span id="cb58-9"><a href="#cb58-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(variable, <span class="st">"standard error:"</span>, sampSE))</span>
+<span id="cb58-10"><a href="#cb58-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(variable, <span class="st">"lower confidence intervals:"</span>, sampCI[<span class="dv">1</span>], <span class="st">"upper confience interval:"</span>, sampCI[<span class="dv">2</span>]))</span>
+<span id="cb58-11"><a href="#cb58-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">metric =</span> <span class="fu">c</span>(<span class="st">"mean"</span>, <span class="st">"standard deviation"</span>, <span class="st">"standard error"</span>, <span class="st">"low confidence interval"</span>, <span class="st">"high confidence interval"</span>), <span class="at">value =</span> (<span class="fu">c</span>(sampMean, sampSD, sampSE, sampCI[<span class="dv">1</span>], sampCI[<span class="dv">2</span>]))))</span>
+<span id="cb58-12"><a href="#cb58-12" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb58-13"><a href="#cb58-13" aria-hidden="true" tabindex="-1"></a>heightMetrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(sampleSurvivors, <span class="st">"height"</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "height mean: 67.6378841436"
+[1] "height standard deviation: 4.45279159460776"
+[1] "height standard error: 0.629719826351522"
+[1] "height lower confidence intervals: 66.4036559636002 upper confience interval: 68.8721123235998"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>weightMetrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(sampleSurvivors, <span class="st">"weight"</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "weight mean: 140.9988559256"
+[1] "weight standard deviation: 19.139630473253"
+[1] "weight standard error: 2.70675249940838"
+[1] "weight lower confidence intervals: 135.693718511696 upper confience interval: 146.303993339504"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>ageMetrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(sampleSurvivors, <span class="st">"age"</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "age mean: 20.4866571458"
+[1] "age standard deviation: 2.66667451345553"
+[1] "age standard error: 0.377124726336349"
+[1] "age lower confidence intervals: 19.7475062645012 upper confience interval: 21.2258080270988"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>zombieKillsMetrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(sampleSurvivors, <span class="st">"zombies_killed"</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "zombies_killed mean: 2.86"
+[1] "zombies_killed standard deviation: 1.81838681590164"
+[1] "zombies_killed standard error: 0.257158729668853"
+[1] "zombies_killed lower confidence intervals: 2.35597815153898 upper confience interval: 3.36402184846102"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>educationMetrics <span class="ot">&lt;-</span> <span class="fu">metrics</span>(sampleSurvivors, <span class="st">"years_of_education"</span>, <span class="fl">0.025</span>, <span class="fl">0.975</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "years_of_education mean: 3.14"
+[1] "years_of_education standard deviation: 1.87366278847021"
+[1] "years_of_education standard error: 0.264975932676836"
+[1] "years_of_education lower confidence intervals: 2.62065671518349 upper confience interval: 3.65934328481651"</code></pre>
+</div>
+</div>
+</section>
+<section id="step-7-create-a-sampling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="step-7-create-a-sampling-distribution">Step 7: Create a Sampling Distribution</h3>
+<p>Now we will draw 199 random sample of 50 survivors to create a sampling distribution which with out initial sample will result in a distribution of 200 means. We will then calculate the means and standard deviations of the sampling distribution for each variable.</p>
+<p>The following mean and standard deviation values are based on the most recent run of this function on 2/26</p>
+<p>Height Mean Range: 65.87-68.99 Height Standard Deviation Range: 3.08-5.44</p>
+<p>Weight Mean Range: 136.75-151.6 Weight Standard Deviation Range: 12.33-23.79</p>
+<p>Age Mean Range: 19.04-21.24 Age Standard Deviation Range: 2.67-3.7</p>
+<p>Number of Zombie Kills Mean Range: 2.4-3.56 Number of Zombie Kills Standard Deviation Range: 1.31-2.26</p>
+<p>Years of Education Mean Range: 2.46-3.58 Years of Education Standard Deviation Range: 1.24-2.14</p>
+<p>For all of my variables, compared to the first sample of 50, the standard deviations for the sampling distributions are higher than the standard errors calculated for the first sample fo 50 individuals. For example, the sample standard error for height was 0.59, while the range for the standard deviation from the sampling distribution was 3.08-5.44. The standard errors for the sample of 50 are as follows:</p>
+<p>Height SE: 0.58<br>
+Weight SE: 2.86<br>
+Age SE: 0.42<br>
+Number of Zombie Kills SE: 0.3<br>
+Years of Education SE: 0.23<br>
+</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>sampMetrics <span class="ot">&lt;-</span> <span class="cf">function</span>(df, variable, sampReps, sampNum){</span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  sampDistMean <span class="ot">&lt;-</span> <span class="fu">vector</span>()</span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  sampDistSD <span class="ot">&lt;-</span> <span class="fu">vector</span>()</span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>sampReps){</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>    sample <span class="ot">&lt;-</span> <span class="fu">slice_sample</span>(df, <span class="at">n =</span> sampNum)</span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>    sampDistMean[i] <span class="ot">&lt;-</span> <span class="fu">mean</span>(sample[[variable]])</span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>    sampDistSD[i] <span class="ot">&lt;-</span> <span class="fu">sd</span>(sample[[variable]])</span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">"Mean and standard deviation for"</span>, sampReps, <span class="st">"random samples of"</span>, sampNum, <span class="st">"survivors is in dataframe!"</span>))</span>
+<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">data.frame</span>(<span class="at">means =</span> sampDistMean, <span class="at">standard_deviation =</span> sampDistSD))</span>
+<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>heightSamp <span class="ot">&lt;-</span> <span class="fu">sampMetrics</span>(z, <span class="st">"height"</span>, <span class="dv">199</span>, <span class="dv">50</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 199 random samples of 50 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>weightSamp <span class="ot">&lt;-</span> <span class="fu">sampMetrics</span>(z, <span class="st">"weight"</span>, <span class="dv">199</span>, <span class="dv">50</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 199 random samples of 50 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>ageSamp <span class="ot">&lt;-</span> <span class="fu">sampMetrics</span>(z, <span class="st">"age"</span>, <span class="dv">199</span>, <span class="dv">50</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 199 random samples of 50 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>zombieKillsSamp <span class="ot">&lt;-</span> <span class="fu">sampMetrics</span>(z, <span class="st">"zombies_killed"</span>, <span class="dv">199</span>, <span class="dv">50</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 199 random samples of 50 survivors is in dataframe!"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>educationSamp <span class="ot">&lt;-</span> <span class="fu">sampMetrics</span>(z, <span class="st">"years_of_education"</span>, <span class="dv">199</span>, <span class="dv">50</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Mean and standard deviation for 199 random samples of 50 survivors is in dataframe!"</code></pre>
+</div>
+</div>
+</section>
+<section id="step-8-plot-sampling-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="step-8-plot-sampling-distribution">Step 8: Plot Sampling Distribution</h3>
+<p>We will not use the hist() function to plot the sampling distributions for each variable. Based on these histograms, all the variables appear to be fairly normally distributed. Height and weight seem to be weighted towards the right and left respectively but follow a bell curve looking pattern associated with normal distributions. The number of zombie kills and years of education appear now to be normally distributed compared to when we first plotted them.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(heightSamp<span class="sc">$</span>means) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(heightSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a><span class="co">#weight</span></span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(weightSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(weightSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co">#age</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(ageSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(ageSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-6.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co">#zombie kills</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(zombieKillsSamp<span class="sc">$</span>means) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-7.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(zombieKillsSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-8.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co">#years of education</span></span>
+<span id="cb86-2"><a href="#cb86-2" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(educationSamp<span class="sc">$</span>means) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-9.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qqnorm</span>(educationSamp<span class="sc">$</span>means)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="ex5_files/figure-html/unnamed-chunk-17-10.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="step-9-create-confidence-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="step-9-create-confidence-intervals">Step 9: Create Confidence Intervals</h3>
+<p>Now we will construct 95% confidence intervals around the sampling distributions. I did this by first creating a function which takes the data we are working with (each sampling distribution) and the name of the column we want to analyse (means) as arguments. The confidence intervals of our sampling distribution are similar to those calculated for our single sample of 50 survivors:</p>
+<p>Sample Height CI: 66.43, 68.74; Sample Distribution Height CI: 66.5, 68.7<br>
+Sample Weight CI: 136.91, 148.14; Sample Distribution Weight CI: 138, 149<br>
+Sample Age CI: 19.33, 20.98; Sample Distribution Age CI: 19.2, 20.9<br>
+Sample Zombie Kills CI: 2.4, 3.56; Sample Distribution Zombie Kills CI: 2.52, 3.46<br>
+Sample Education Years CI: 2.54, 3.46; Sample Distribution Education Years CI: 2.56, 3.46</p>
+<p>The sample confidence intervals appear to be a little bit wider than the confidence intervals for the sample distributions</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>samp95CI <span class="ot">&lt;-</span> <span class="cf">function</span>(df, meanVariable){</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">mean</span>(df[[meanVariable]])</span>
+<span id="cb88-3"><a href="#cb88-3" aria-hidden="true" tabindex="-1"></a>  se <span class="ot">&lt;-</span> <span class="fu">sd</span>(df[[meanVariable]])</span>
+<span id="cb88-4"><a href="#cb88-4" aria-hidden="true" tabindex="-1"></a>  ci <span class="ot">&lt;-</span> m <span class="sc">+</span> <span class="fu">qnorm</span>(<span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)) <span class="sc">*</span> se</span>
+<span id="cb88-5"><a href="#cb88-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(<span class="st">"Confidence intervals have been caluclated and stored in values."</span>)</span>
+<span id="cb88-6"><a href="#cb88-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ci)</span>
+<span id="cb88-7"><a href="#cb88-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb88-8"><a href="#cb88-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb88-9"><a href="#cb88-9" aria-hidden="true" tabindex="-1"></a>heightSampCI <span class="ot">&lt;-</span> <span class="fu">samp95CI</span>(heightSamp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Confidence intervals have been caluclated and stored in values."</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>weightSampCI <span class="ot">&lt;-</span> <span class="fu">samp95CI</span>(weightSamp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Confidence intervals have been caluclated and stored in values."</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a>ageSampCI <span class="ot">&lt;-</span> <span class="fu">samp95CI</span>(ageSamp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Confidence intervals have been caluclated and stored in values."</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a>zombieKillSampCI <span class="ot">&lt;-</span> <span class="fu">samp95CI</span>(zombieKillsSamp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Confidence intervals have been caluclated and stored in values."</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>edYearsSampCI <span class="ot">&lt;-</span> <span class="fu">samp95CI</span>(educationSamp, <span class="st">"means"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Confidence intervals have been caluclated and stored in values."</code></pre>
+</div>
+</div>
+</section>
+<section id="step-10-confidence-intervals-by-bootstrapping" class="level3">
+<h3 class="anchored" data-anchor-id="step-10-confidence-intervals-by-bootstrapping">Step 10: Confidence Intervals by Bootstrapping</h3>
+<p>Finally, we will again calculate the confidence intervals but by using the bootstrapping method. Using the function I created below, we will sample the mean of each variable 1000 times with replacement from the original sample of 50 survivors. Using this method, we get the following confidence intervals:</p>
+<p>Height: 66.37, 68.69<br>
+Weight: 136.74, 148.56<br>
+Age: 19.42, 20.99<br>
+Zombie Kills: 2.4, 3.54<br>
+Education Years: 2.56, 3.46</p>
+<p>Compared to step 9, these confidence intervals are overall wider, similar to the original confidence intervals we created for the sample of 50</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>bootstrap <span class="ot">&lt;-</span> <span class="cf">function</span>(df, variable, resampNum){</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  n_boot <span class="ot">&lt;-</span> resampNum</span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>  boot <span class="ot">&lt;-</span> <span class="fu">vector</span>(<span class="at">length=</span>n_boot)</span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">length</span>(df[[variable]])</span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_boot){</span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>    boot[[i]] <span class="ot">&lt;-</span> <span class="fu">mean</span>(<span class="fu">sample</span>(df[[variable]], n, <span class="at">replace =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>  ci <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot, <span class="at">probs =</span> <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))</span>
+<span id="cb98-9"><a href="#cb98-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(ci)</span>
+<span id="cb98-10"><a href="#cb98-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(ci)</span>
+<span id="cb98-11"><a href="#cb98-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb98-12"><a href="#cb98-12" aria-hidden="true" tabindex="-1"></a>heightBoot <span class="ot">&lt;-</span> <span class="fu">bootstrap</span>(sampleSurvivors, <span class="st">"height"</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    2.5%    97.5% 
+66.44156 68.78523 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>weightBoot <span class="ot">&lt;-</span> <span class="fu">bootstrap</span>(sampleSurvivors, <span class="st">"weight"</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    2.5%    97.5% 
+135.7738 146.0651 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>ageBoot <span class="ot">&lt;-</span> <span class="fu">bootstrap</span>(sampleSurvivors, <span class="st">"age"</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    2.5%    97.5% 
+19.80660 21.20544 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>zombieKillsBoot <span class="ot">&lt;-</span> <span class="fu">bootstrap</span>(sampleSurvivors, <span class="st">"zombies_killed"</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 2.5% 97.5% 
+ 2.34  3.32 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>edYearsBoot <span class="ot">&lt;-</span> <span class="fu">bootstrap</span>(sampleSurvivors, <span class="st">"years_of_education"</span>, <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 2.5% 97.5% 
+ 2.60  3.68 </code></pre>
+</div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const onCopySuccess = function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  }
+  const getTextToCopy = function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+    text: getTextToCopy
+  });
+  clipboard.on('success', onCopySuccess);
+  if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+    // For code content inside modals, clipBoardJS needs to be initialized with a container option
+    // TODO: Check when it could be a function (https://github.com/zenorocha/clipboard.js/issues/860)
+    const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+      text: getTextToCopy,
+      container: window.document.getElementById('quarto-embedded-source-code-modal')
+    });
+    clipboardModal.on('success', onCopySuccess);
+  }
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp('/' + window.location.host + '/');
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

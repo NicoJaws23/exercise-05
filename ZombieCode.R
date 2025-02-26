@@ -90,7 +90,7 @@ metrics <- function(data, variable, lowCIBound, highCIBound){
   print(paste(variable, "standard deviation:", sampSD))
   print(paste(variable, "standard error:", sampSE))
   print(paste(variable, "lower confidence intervals:", sampCI[1], "upper confience interval:", sampCI[2]))
-  return(data.frame(metric = c("mean", "standard deviation", "standard error", "low confidence interval", "high confidence interval"), value = (c(sampMean, sampSD, sampSE, sampCI[1], sampCI[2]))))
+  return(data.frame(mean = sampMean, sd = sampSD, se = sampSE, lowerCI = sampCI[1], upperCI = sampCI[2]))
 }
 heightMetrics <- metrics(sampleSurvivors, "height", 0.025, 0.975)
 weightMetrics <- metrics(sampleSurvivors, "weight", 0.025, 0.975)
@@ -136,7 +136,7 @@ samp95CI <- function(df, meanVariable){
   m <- mean(df[[meanVariable]])
   se <- sd(df[[meanVariable]])
   ci <- m + qnorm(c(0.025, 0.975)) * se
-  print("Confidene intervals have been caluclated and stored in values.")
+  print("Confidence intervals have been caluclated and stored in values.")
   return(ci)
 }
 
@@ -160,9 +160,8 @@ bootstrap <- function(df, variable, resampNum){
   print(ci)
   return(ci)
 }
-heightBoot <- bootstrap(z, "height", 1000)
-weightBoot <- bootstrap(z, "weight", 1000)
-ageBoot <- bootstrap(z, "age", 1000)
-zombieKillsBoot <- bootstrap(z, "zombies_killed", 1000)
-edYearsBoot <- bootstrap(z, "years_of_education", 1000)
-?quantile()
+heightBoot <- bootstrap(sampleSurvivors, "height", 1000)
+weightBoot <- bootstrap(sampleSurvivors, "weight", 1000)
+ageBoot <- bootstrap(sampleSurvivors, "age", 1000)
+zombieKillsBoot <- bootstrap(sampleSurvivors, "zombies_killed", 1000)
+edYearsBoot <- bootstrap(sampleSurvivors, "years_of_education", 1000)

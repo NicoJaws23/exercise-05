@@ -1,3 +1,4 @@
+#Step 1, loading libraries and data sets
 library(tidyverse)
 library(mosaic)
 #link dataset
@@ -5,7 +6,7 @@ f <- "https://raw.githubusercontent.com/difiore/ada-datasets/main/IMDB-movies.cs
 #load dataset
 d <- read_csv(f)
 names(d)
-#filter dataset for just movies made from 1920-1979 and have a run time of 1 to 3 hours
+#Step 2: filter dataset for just movies made from 1920-1979 and have a run time of 1 to 3 hours
 #and add a new column "decade" based on "startYear"
 d2 <- d |>
   filter(startYear >= 1920 & startYear <= 1979) |>
@@ -19,62 +20,104 @@ d2 <- d |>
     startYear >= 1970 & startYear <= 1979 ~ "70s"
   ))  
 
-#histograms for each decade showing distriution of movie run time
+#Step 3: histograms for each decade showing distriution of movie run time
 ggplot(data = d2, mapping = aes(x = runtimeMinutes)) +
   geom_histogram() +
   facet_wrap(vars(decade))
 
-#mean and standard deviation of runtime by decade
+#Step 4: mean and standard deviation of runtime by decade
 results <- d2 |>
   group_by(decade) |>
   summarise(popMean = mean(runtimeMinutes), popSD = sd(runtimeMinutes))
 
-#create separate dataframes for each decade
-d20s <- filter(d2, decade == "20s")
-d30s <- filter(d2, decade == "30s")
-d40s <- filter(d2, decade == "40s")
-d50s <- filter(d2, decade == "50s")
-d60s <- filter(d2, decade == "60s")
-d70s <- filter(d2, decade == "60s")
+#Step 5: sample 100 moives from each decade
+#sampling function, d2 is dataframe we are pulling from
+movieSamp <- function(df, decadeVal, variable, num){
+  data <- filter(df, decade == decadeVal)
+  samp <- slice_sample(data, n = num)
+  sampMean <- mean(samp[[variable]])
+  sampSD <- sd(samp[[variable]])
+  data <- data.frame(runTimeMean = sampMean, runTimeSD = sampSD)
+  return(data)
+}
 
-#sample 100 movies from each decade and calculate the sample mean
-#and standard deviation in runtimeMinutes
-d20Sample <- slice_sample(d20s, n = 100)
-d20SampMeanSD <- d20Sample |>
-  summarise(SampleMean = mean(runtimeMinutes), SampleSD = sd(runtimeMinutes))
+d20s <- movieSamp(d2, "20s", "runtimeMinutes", 100)
+d30s <- movieSamp(d2, "30s", "runtimeMinutes", 100)
+d40s <- movieSamp(d2, "40s", "runtimeMinutes", 100)
+d50s <- movieSamp(d2, "50s", "runtimeMinutes", 100)
+d60s <- movieSamp(d2, "60s", "runtimeMinutes", 100)
+d70s <- movieSamp(d2, "70s", "runtimeMinutes", 100)
 
-d30Sample <- slice_sample(d30s, n = 100)
-d30SampMeanSD <- d30Sample |>
-  summarise(SampleMean = mean(runtimeMinutes), SampleSD = sd(runtimeMinutes))
 
-d40Sample <- slice_sample(d40s, n = 100)
-d40SampMeanSD <- d40Sample |>
-  summarise(SampleMean = mean(runtimeMinutes), SampleSD = sd(runtimeMinutes))
+#Step 6: calculate the standard error for each decade
+#Need to use sd/sqrt(length(x)) method, x here is the sample, ex d20s
+#Function for generating and storing the standard error of each sample
+#need to use d20s-d70s data created with movieSamp()
+se <- function(df, sdVariable){
+  sd <- df[[sdVariable]]
+  se <- sd/sqrt(length(df))
+  return(se)
+}
+d20s <- d20s |>
+  mutate(runTimeSE = se(d20s, "runTimeSD"))
+d30s <- d30s |>
+  mutate(runTimeSE = se(d30s, "runTimeSD"))
+d40s <- d40s |>
+  mutate(runTimeSE = se(d40s, "runTimeSD"))
+d50s <- d50s |>
+  mutate(runTimeSE = se(d50s, "runTimeSD"))
+d60s <- d60s |>
+  mutate(runTimeSE = se(d60s, "runTimeSD"))
+d70s <- d70s |>
+  mutate(runTimeSE = se(d70s, "runTimeSD"))
+#Step 7: Compare these sampled means and the standard error
+#calculate the actual means, sd, and se of the population for each decade
+#reults data
 
-d50Sample <- slice_sample(d50s, n = 100)
-d50SampMeanSD <- d50Sample |>
-  summarise(SampleMean = mean(runtimeMinutes), SampleSD = sd(runtimeMinutes))
-
-d60Sample <- slice_sample(d60s, n = 100)
-d60SampMeanSD <- d60Sample |>
-  summarise(SampleMean = mean(runtimeMinutes), SampleSD = sd(runtimeMinutes))
-
-d70Sample <- slice_sample(d70s, n = 100)
-d70SampMeanSD <- d70Sample |>
-  summarise(SampleMean = mean(runtimeMinutes), SampleSD = sd(runtimeMinutes))
-
-#calculate the standard error for each decade
-#Need to use sd/sqrt(length(x)) method, x here is the sample, ex d20Sample
-
-se20s <- d20SampMeanSD$SampleSD/sqrt(length(d20Sample))
-se30s <- d30SampMeanSD$SampleSD/sqrt(length(d30Sample))
-se40s <- d40SampMeanSD$SampleSD/sqrt(length(d40Sample))
-se50s <- d50SampMeanSD$SampleSD/sqrt(length(d50Sample))
-se60s <- d60SampMeanSD$SampleSD/sqrt(length(d60Sample))
-se70s <- d70SampMeanSD$SampleSD/sqrt(length(d70Sample))
-
-#Generating sampling distribution drawing 1000 random samples of 100 movies
+#Step 8: Generating sampling distribution drawing 1000 random samples of 100 movies
 #by decade. Calculating the mean and sd in runtimeMinutes
-reps <- 1000
-sampleDist20s <- do(reps) * mean(rnorm(n = d20Sample, mean = 96.25658, sd = 26.20133))
+sampMetricsDecade <- function(df, variable, decadeVal, sampReps, sampNum){
+  data <- filter(df, decade == decadeVal)
+  sampDistMean <- as.numeric(sampReps)
+  sampDistSD <- as.numeric(sampReps)
+  for(i in 1:sampReps){
+    sample <- slice_sample(data, n = sampNum)
+    sampDistMean[i] <- mean(sample[[variable]])
+    sampDistSD[i] <- sd(sample[[variable]])
+  }
+  print(paste("Mean and standard deviation for", sampReps, "random samples of", sampNum, "survivors is in dataframe!"))
+  return(data.frame(means = sampDistMean, standard_deviation = sampDistSD))
+}
+d20samp <- sampMetricsDecade(d2, "runtimeMinutes", "20s", 1000, 100)
+d30samp <- sampMetricsDecade(d2, "runtimeMinutes", "30s", 1000, 100)
+d40samp <- sampMetricsDecade(d2, "runtimeMinutes", "40s", 1000, 100)
+d50samp <- sampMetricsDecade(d2, "runtimeMinutes", "50s", 1000, 100)
+d60samp <- sampMetricsDecade(d2, "runtimeMinutes", "60s", 1000, 100)
+d70samp <- sampMetricsDecade(d2, "runtimeMinutes", "70s", 1000, 100)
 
+#Step 9: Calc the mean and standard deviation of the sample dist
+#of the sample means for each decade and plot on histogram
+#the sampling distribution, sd of the sample means of the sample
+#create histograms of the sampling distributions for each decade
+sampMeanSD <- function(df, Meanvariable){
+  sampDistMean <- mean(df[[Meanvariable]])
+  sampDistSD <- sd(df[[Meanvariable]])
+  print(paste("Mean =", sampDistMean, "; SD =", sampDistSD))
+  return(data.frame(sampleDistMean = sampDistMean, sampleDistSD = sampDistSD))
+}
+
+d20distMeanSD <- sampMeanSD(d20samp, "means")
+d30distMeanSD <- sampMeanSD(d30samp, "means")
+d40distMeanSD <- sampMeanSD(d40samp, "means")
+d50distMeanSD <- sampMeanSD(d50samp, "means")
+d60distMeanSD <- sampMeanSD(d60samp, "means")
+d70distMeanSD <- sampMeanSD(d70samp, "means")
+
+hist(d20samp$means)
+hist(d30samp$means)
+hist(d40samp$means)
+hist(d50samp$means)
+hist(d60samp$means)
+hist(d70samp$means)
+
+#Step 10: Answer questions for quarto document

@@ -4,23 +4,166 @@ format: html
 editor: visual
 ---
 
-## Quarto
+# Challenge 1: Sampling Movies
 
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+For this first challenge we will be conducting statistics on the run-time of minutes for movies made between 1920 to 1979
 
-## Running Code
+### Step 1: Load in Libraries and Data
 
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
+For this challenge, we will be using functions from the {tidyverse} and {mosaic} packages, so we will load them in now along with the IMDB-movies dataset
 
 ```{r}
-#| echo: false
-2 * 2
+library(tidyverse)
+library(mosaic)
+
+f <- "https://raw.githubusercontent.com/difiore/ada-datasets/main/IMDB-movies.csv"
+
+d <- read_csv(f)
+names(d)
 ```
 
-The `echo: false` option disables the printing of code (only output is displayed).
+### Step 2: Filter Movies Based on Length and Release Year
+
+Next we need to narrow down our list of movies. We will do this by calling the filter function to select movies with startYear values of 1920-1979 and then filter based on runtimeMinutes for movies which are 60 to 180 minutes (1 to 3 hours). After that, we want to assign a decade designation to each movie. We will be this by using the case_when() function within the mutate() function. The case_when() function will assign movies a specific decade designation based on when they were released. As a result, we get a dataset (d2) with 5,651 movies
+
+```{r}
+d2 <- d |>
+  filter(startYear >= 1920 & startYear <= 1979) |>
+  filter(runtimeMinutes >= 60 & runtimeMinutes <= 180) |>
+  mutate(decade = case_when(
+    startYear >= 1920 & startYear <= 1929 ~ "20s",
+    startYear >= 1930 & startYear <= 1939 ~ "30s",
+    startYear >= 1940 & startYear <= 1949 ~ "40s",
+    startYear >= 1950 & startYear <= 1959 ~ "50s",
+    startYear >= 1960 & startYear <= 1969 ~ "60s",
+    startYear >= 1970 & startYear <= 1979 ~ "70s"
+  ))  
+```
+
+### Step 3: Plot Histograms
+
+Now we will do some initial visualization of our data. We will use ggplot() to create histograms which, using facet_wrap(), will show the distribution of runtimeMinutes for each decade.
+
+```{r}
+ggplot(data = d2, mapping = aes(x = runtimeMinutes)) +
+  geom_histogram() +
+  facet_wrap(vars(decade))
+```
+
+### Step 4: Calculate Population Mean and Standard Deviation
+
+For later comparison, we will measure the mean and standard deviation for runtimeMinutes per decade and save it in a data frame called "results". This will utilize the group_by() and summarise() functions to group observations based on matching decade values before summarizing the mean and standard deviations for runtimeMinutes
+
+```{r}
+results <- d2 |>
+  group_by(decade) |>
+  summarise(popMean = mean(runtimeMinutes), popSD = sd(runtimeMinutes))
+```
+
+### Step 5: Sample of 100 Movies
+
+Next, we will take a sample of 100 movies from each decade and calculate the mean and standard deviation of runtimeMinutes for each decade's sample of 100 movies. Rather than rewrite the same code for each decade, I created a function which will take our d2 data set, the value of the decade to sample from, and the variable we want to measure (runtimeMinutes). The final argument is the number of samples we want to pull from the data set based on the other arguments.
+
+```{r}
+movieSamp <- function(df, decadeVal, variable, num){
+  data <- filter(df, decade == decadeVal)
+  samp <- slice_sample(data, n = num)
+  sampMean <- mean(samp[[variable]])
+  sampSD <- sd(samp[[variable]])
+  data <- data.frame(runTimeMean = sampMean, runTimeSD = sampSD)
+  return(data)
+}
+
+d20s <- movieSamp(d2, "20s", "runtimeMinutes", 100)
+d30s <- movieSamp(d2, "30s", "runtimeMinutes", 100)
+d40s <- movieSamp(d2, "40s", "runtimeMinutes", 100)
+d50s <- movieSamp(d2, "50s", "runtimeMinutes", 100)
+d60s <- movieSamp(d2, "60s", "runtimeMinutes", 100)
+d70s <- movieSamp(d2, "70s", "runtimeMinutes", 100)
+
+```
+
+### Step 6: Calculate the Standard Error Based on Sample Population Mean
+
+Next we need to calculate the standard error of the population's mean runtimeMinutes based on the standard deviation from our sample of 100 movies. To do this, I created another function which takes the data set we want and the standard deviation variable in the data set to calculate the standard error. I then use the mutate() function to add a third column (runTimeSE) to each decades data frame holding these metrics
+
+```{r}
+se <- function(df, sdVariable){
+  sd <- df[[sdVariable]]
+  se <- sd/sqrt(length(df))
+  return(se)
+}
+d20s <- d20s |>
+  mutate(runTimeSE = se(d20s, "runTimeSD"))
+d30s <- d30s |>
+  mutate(runTimeSE = se(d30s, "runTimeSD"))
+d40s <- d40s |>
+  mutate(runTimeSE = se(d40s, "runTimeSD"))
+d50s <- d50s |>
+  mutate(runTimeSE = se(d50s, "runTimeSD"))
+d60s <- d60s |>
+  mutate(runTimeSE = se(d60s, "runTimeSD"))
+d70s <- d70s |>
+  mutate(runTimeSE = se(d70s, "runTimeSD"))
+
+```
+
+### Step 7: Compare Estimates of Population runtimeMinutes with the Sample of 100
+
+### Step 8: Create Sampling Distribution
+
+Now, we shall create a sampling distribution based on runtimeMinutes which will pull 1000 random samples of 100 movies from each decade without replacement. From this sample distribution we will calculate the mean and standard deviation for each sample pulled. To do this I created a function which takes the data set (d2), variable (runtimeMinutes), decade (20s, 30s, etc), sample repetitions (1000), and the number of movies to be pulled with each sample (100). I use a for() loop in this function to do each iteration of the sampling distribution. Originally, I tried using the do() function from {mosaic} but this resulted in each sample in the distribution having the same mean and standard deviation, which did not seem right haha.
+
+```{r}
+sampMetricsDecade <- function(df, variable, decadeVal, sampReps, sampNum){
+  data <- filter(df, decade == decadeVal)
+  sampDistMean <- as.numeric(sampReps)
+  sampDistSD <- as.numeric(sampReps)
+  for(i in 1:sampReps){
+    sample <- slice_sample(data, n = sampNum)
+    sampDistMean[i] <- mean(sample[[variable]])
+    sampDistSD[i] <- sd(sample[[variable]])
+  }
+  print(paste("Mean and standard deviation for", sampReps, "random samples of", sampNum, "survivors is in dataframe!"))
+  return(data.frame(means = sampDistMean, standard_deviation = sampDistSD))
+}
+d20samp <- sampMetricsDecade(d2, "runtimeMinutes", "20s", 1000, 100)
+d30samp <- sampMetricsDecade(d2, "runtimeMinutes", "30s", 1000, 100)
+d40samp <- sampMetricsDecade(d2, "runtimeMinutes", "40s", 1000, 100)
+d50samp <- sampMetricsDecade(d2, "runtimeMinutes", "50s", 1000, 100)
+d60samp <- sampMetricsDecade(d2, "runtimeMinutes", "60s", 1000, 100)
+d70samp <- sampMetricsDecade(d2, "runtimeMinutes", "70s", 1000, 100)
+
+```
+
+### Step 9: Calculate Mean and Standard Deviation of the Sampling Distribution and Plot Sampling Distribution
+
+Finally in our analysis, we will calculate the mean and standard deviation of the sampling distribution we generated. I will do this by passing the mean variable though a function I made to calculate the mean and standard deviation of the sampling distributions. Then, to visualize our data, we will plot histograms of the distribution of the means in the sampling distribution. These all have a shape associated with a normal distribution.
+
+```{r}
+sampMeanSD <- function(df, Meanvariable){
+  sampDistMean <- mean(df[[Meanvariable]])
+  sampDistSD <- sd(df[[Meanvariable]])
+  print(paste("Mean =", sampDistMean, "; SD =", sampDistSD))
+  return(data.frame(sampleDistMean = sampDistMean, sampleDistSD = sampDistSD))
+}
+
+d20distMeanSD <- sampMeanSD(d20samp, "means")
+d30distMeanSD <- sampMeanSD(d30samp, "means")
+d40distMeanSD <- sampMeanSD(d40samp, "means")
+d50distMeanSD <- sampMeanSD(d50samp, "means")
+d60distMeanSD <- sampMeanSD(d60samp, "means")
+d70distMeanSD <- sampMeanSD(d70samp, "means")
+
+hist(d20samp$means)
+hist(d30samp$means)
+hist(d40samp$means)
+hist(d50samp$means)
+hist(d60samp$means)
+hist(d70samp$means)
+
+```
+
+### Step 10: Comparing The Population, Sample, and Sampling Distribution
+
+# Challenge 2: Sampling Zombie Survivors

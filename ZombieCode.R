@@ -84,7 +84,7 @@ sampleSurvivors <- slice_sample(z, n = 50)
 metrics <- function(data, variable, lowCIBound, highCIBound){
   sampMean <- mean(data[[variable]])
   sampSD <- sd(data[[variable]])
-  sampSE <- sampSD/sqrt(length(data))
+  sampSE <- sampSD/sqrt(length(data[[variable]]))
   sampCI <- sampMean + qnorm(c(lowCIBound, highCIBound)) * sampSE
   print(paste(variable, "mean:", sampMean))
   print(paste(variable, "standard deviation:", sampSD))
@@ -97,39 +97,13 @@ weightMetrics <- metrics(sampleSurvivors, "weight", 0.025, 0.975)
 ageMetrics <- metrics(sampleSurvivors, "age", 0.025, 0.975)
 zombieKillsMetrics <- metrics(sampleSurvivors, "zombies_killed", 0.025, 0.975)
 educationMetrics <- metrics(sampleSurvivors, "years_of_education", 0.025, 0.975)
-#Height
-#sampHeightM <- mean(sampleSurvivors$height)
-#sampHeightSD <- sd(sampleSurvivors$height)
-#sampHeightSE <- sampHeightSD/sqrt(length(sampleSurvivors))
-#sampHeightCI <- sampHeightM + qnorm(c(0.025, 0.975)) * sampHeightSE
-#Weight
-#sampWeightM <- mean(sampleSurvivors$weight)
-#sampWeightSD <- sd(sampleSurvivors$weight)
-#sampWeightSE <- sampWeightSD/sqrt(length(sampleSurvivors))
-#sampWeightCI <- sampWeightM + qnorm(c(0.025, 0.975)) * sampWeightSE
-#Age
-#sampAgeM <- mean(sampleSurvivors$age)
-#sampAgeSD <- sd(sampleSurvivors$age)
-#sampAgeSE <- sampAgeSD/sqrt(length(sampleSurvivors))
-#sampAgeCI <- sampAgeM + qnorm(c(0.025, 0.975)) * sampAgeSE
-#Zombie Kills
-#sampZKM <- mean(sampleSurvivors$zombies_killed)
-#sampZKSD <- sd(sampleSurvivors$zombies_killed)
-#sampZKSE <- sampZKSD/sqrt(length(sampleSurvivors))
-#sampZKCI <- sampZKM + qnorm(c(0.025, 0.975)) * sampZKSE
-#Years of Education
-#sampYEM <- mean(sampleSurvivors$years_of_education)
-#sampYESD <- sd(sampleSurvivors$years_of_education)
-#sampYESE <- sampYESD/sqrt(length(sampleSurvivors))
-#sampYECI <- sampYEM + qnorm(c(0.025, 0.975)) * sampYESE
-
 
 #Step 7: Draw 199 random samples of 50 survivors, calculate mean
 #and standard deviations
 #Function to do this
 sampMetrics <- function(df, variable, sampReps, sampNum){
-  sampDistMean <- as.numeric(sampReps)
-  sampDistSD <- as.numeric(sampReps)
+  sampDistMean <- vector()
+  sampDistSD <- vector()
   for(i in 1:sampReps){
     sample <- slice_sample(df, n = sampNum)
     sampDistMean[i] <- mean(sample[[variable]])
@@ -162,9 +136,10 @@ samp95CI <- function(df, meanVariable){
   m <- mean(df[[meanVariable]])
   se <- sd(df[[meanVariable]])
   ci <- m + qnorm(c(0.025, 0.975)) * se
-  print("Confidene intervals have been caluclated and stored in values")
+  print("Confidene intervals have been caluclated and stored in values.")
   return(ci)
 }
+
 heightSampCI <- samp95CI(heightSamp, "means")
 weightSampCI <- samp95CI(weightSamp, "means")
 ageSampCI <- samp95CI(ageSamp, "means")
@@ -177,7 +152,7 @@ edYearsSampCI <- samp95CI(educationSamp, "means")
 bootstrap <- function(df, variable, resampNum){
   n_boot <- resampNum
   boot <- vector(length=n_boot)
-  n <- length(df)
+  n <- length(df[[variable]])
   for(i in 1:n_boot){
     boot[[i]] <- mean(sample(df[[variable]], n, replace = TRUE))
   }
@@ -190,3 +165,4 @@ weightBoot <- bootstrap(z, "weight", 1000)
 ageBoot <- bootstrap(z, "age", 1000)
 zombieKillsBoot <- bootstrap(z, "zombies_killed", 1000)
 edYearsBoot <- bootstrap(z, "years_of_education", 1000)
+?quantile()

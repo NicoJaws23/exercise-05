@@ -100,23 +100,23 @@ Next we need to calculate the standard error of the population's mean runtimeMin
 ```{r}
 #| message: false
 #| warning: false
-se <- function(df, sdVariable){
+se <- function(df, sdVariable, sampNum){
   sd <- df[[sdVariable]]
-  se <- sd/sqrt(100)
+  se <- sd/sqrt(sampNum)
   return(se)
 }
 d20s <- d20s |>
-  mutate(runTimeSE = se(d20s, "runTimeSD"))
+  mutate(runTimeSE = se(d20s, "runTimeSD", 100))
 d30s <- d30s |>
-  mutate(runTimeSE = se(d30s, "runTimeSD"))
+  mutate(runTimeSE = se(d30s, "runTimeSD", 100))
 d40s <- d40s |>
-  mutate(runTimeSE = se(d40s, "runTimeSD"))
+  mutate(runTimeSE = se(d40s, "runTimeSD", 100))
 d50s <- d50s |>
-  mutate(runTimeSE = se(d50s, "runTimeSD"))
+  mutate(runTimeSE = se(d50s, "runTimeSD", 100))
 d60s <- d60s |>
-  mutate(runTimeSE = se(d60s, "runTimeSD"))
+  mutate(runTimeSE = se(d60s, "runTimeSD", 100))
 d70s <- d70s |>
-  mutate(runTimeSE = se(d70s, "runTimeSD"))
+  mutate(runTimeSE = se(d70s, "runTimeSD", 100))
 
 ```
 
@@ -137,12 +137,12 @@ d70se <- 17.95934/sqrt(100)
 
 | Decade | PopMean | SampleMean | PopSD | SampleSD | PopSE | SampleSE |
 |--------|---------|------------|-------|----------|-------|----------|
-| 20s    | 96.3    | 97.7       | 26.2  | 27.1     | 2.62  | 2.71     |
-| 30s    | 90.3    | 90.5       | 17.3  | 18.6     | 1.72  | 1.86     |
-| 40s    | 97.3    | 97         | 19.1  | 17.6     | 1.91  | 1.76     |
-| 50s    | 98.9    | 99.7       | 19.2  | 18.7     | 1.92  | 1.87     |
-| 60s    | 105.6   | 106        | 21.2  | 22.6     | 2.12  | 2.26     |
-| 70s    | 103.8   | 102        | 18.0  | 17.2     | 1.79  | 1.72     |
+| 20s    | 96.3    | 96.9       | 26.2  | 26.1     | 2.62  | 2.61     |
+| 30s    | 90.3    | 91.8       | 17.3  | 16.6     | 1.72  | 1.66     |
+| 40s    | 97.3    | 97.8       | 19.1  | 20.1     | 1.91  | 2.01     |
+| 50s    | 98.9    | 98.8       | 19.2  | 18.9     | 1.92  | 1.89     |
+| 60s    | 105.6   | 105        | 21.2  | 19.3     | 2.12  | 1.93     |
+| 70s    | 103.8   | 105        | 18.0  | 18.1     | 1.79  | 1.81     |
 
 ### Step 8: Create Sampling Distribution
 
@@ -174,7 +174,7 @@ d70samp <- sampMetricsDecade(d2, "runtimeMinutes", "70s", 1000, 100)
 
 ### Step 9: Calculate Mean and Standard Deviation of the Sampling Distribution and Plot Sampling Distribution
 
-Finally in our analysis, we will calculate the mean and standard deviation of the sampling distribution we generated. I will do this by passing the mean variable though a function I made to calculate the mean and standard deviation of the sampling distributions. Then, to visualize our data, we will plot histograms of the distribution of the means in the sampling distribution. These all have a shape associated with a normal distribution.
+Finally in our analysis, we will calculate the mean and standard deviation of the sampling distribution we generated. I will do this by passing the mean variable though a function I made to calculate the mean and standard deviation of the sampling distributions. The standard deivation of the sample distribution means gives us our standard error for the sampling distribution. Then, to visualize our data, we will plot histograms of the distribution of the means in the sampling distribution. These all have a shape associated with a normal distribution.
 
 ```{r}
 #| message: false
@@ -338,7 +338,7 @@ sampleSurvivors <- slice_sample(z, n = 50)
 metrics <- function(data, variable, lowCIBound, highCIBound){
   sampMean <- mean(data[[variable]])
   sampSD <- sd(data[[variable]])
-  sampSE <- sampSD/sqrt(length(data[[variable]]))
+  sampSE <- sampSD/sqrt(50)
   sampCI <- sampMean + qnorm(c(lowCIBound, highCIBound)) * sampSE
   print(paste(variable, "mean:", sampMean))
   print(paste(variable, "standard deviation:", sampSD))
@@ -346,6 +346,7 @@ metrics <- function(data, variable, lowCIBound, highCIBound){
   print(paste(variable, "lower confidence intervals:", sampCI[1], "upper confience interval:", sampCI[2]))
   return(data.frame(metric = c("mean", "standard deviation", "standard error", "low confidence interval", "high confidence interval"), value = (c(sampMean, sampSD, sampSE, sampCI[1], sampCI[2]))))
 }
+
 heightMetrics <- metrics(sampleSurvivors, "height", 0.025, 0.975)
 weightMetrics <- metrics(sampleSurvivors, "weight", 0.025, 0.975)
 ageMetrics <- metrics(sampleSurvivors, "age", 0.025, 0.975)
@@ -357,26 +358,6 @@ educationMetrics <- metrics(sampleSurvivors, "years_of_education", 0.025, 0.975)
 ### Step 7: Create a Sampling Distribution
 
 Now we will draw 199 random sample of 50 survivors to create a sampling distribution which with out initial sample will result in a distribution of 200 means. We will then calculate the means and standard deviations of the sampling distribution for each variable.
-
-The following mean and standard deviation values are based on the most recent run of this function on 2/26
-
-Height Mean Range: 65.87-68.99 Height Standard Deviation Range: 3.08-5.44
-
-Weight Mean Range: 136.75-151.6 Weight Standard Deviation Range: 12.33-23.79
-
-Age Mean Range: 19.04-21.24 Age Standard Deviation Range: 2.67-3.7
-
-Number of Zombie Kills Mean Range: 2.4-3.56 Number of Zombie Kills Standard Deviation Range: 1.31-2.26
-
-Years of Education Mean Range: 2.46-3.58 Years of Education Standard Deviation Range: 1.24-2.14
-
-For all of my variables, compared to the first sample of 50, the standard deviations for the sampling distributions are higher than the standard errors calculated for the first sample fo 50 individuals. For example, the sample standard error for height was 0.59, while the range for the standard deviation from the sampling distribution was 3.08-5.44. The standard errors for the sample of 50 are as follows:
-
-Height SE: 0.58\
-Weight SE: 2.86\
-Age SE: 0.42\
-Number of Zombie Kills SE: 0.3\
-Years of Education SE: 0.23\
 
 ```{r}
 #| message: false
@@ -392,12 +373,34 @@ sampMetrics <- function(df, variable, sampReps, sampNum){
   print(paste("Mean and standard deviation for", sampReps, "random samples of", sampNum, "survivors is in dataframe!"))
   return(data.frame(means = sampDistMean, standard_deviation = sampDistSD))
 }
-heightSamp <- sampMetrics(z, "height", 199, 50) 
-weightSamp <- sampMetrics(z, "weight", 199, 50) 
+
+heightSamp <- sampMetrics(z, "height", 199, 50)
+heightSampMMSE <- summarise(heightSamp, MM = mean(means), SE = sd(means))
+
+weightSamp <- sampMetrics(z, "weight", 199, 50)
+weightSampMMSE <- summarise(weightSamp, MM = mean(means), SE = sd(means))
+
 ageSamp <- sampMetrics(z, "age", 199, 50) 
+ageSampMMSE <- summarise(ageSamp, MM = mean(means), SE = sd(means))
+
 zombieKillsSamp <- sampMetrics(z, "zombies_killed", 199, 50) 
+zombieKillSampMMSE <- summarise(zombieKillsSamp, MM = mean(means), SE = sd(means))
+
 educationSamp <- sampMetrics(z, "years_of_education", 199, 50) 
+educationSampMMSE <- summarise(educationSamp, MM = mean(means), SE = sd(means))
 ```
+
+The following mean and standard deviation values are based on the most recent run of this function on 2/27
+
+For all of my variables, compared to the first sample of 50, the standard deviations for the sampling distributions are similar to the standard error calculated for the first sample of 50 with very little variation. The table below summarizes the mean, standard deviation, and standard error for the sample of 50 along with the range of means, mean of the means, standard deviation range, and standard deviation of the means (standard error) of the sample distribution. The values for the sample mean and standard deviation fall within the range in the sampling distribution while the standard error of both the sample and sampling distribution are similar to each other.
+
+| Variable | 50SampMean | 50SampSD | 50SampSE | DistMeanRange | DistMeanMean | DistSDRange | DistSE |
+|--------|------------|----------|----------|---------|---------|-----------|-------|
+| Height | 67.72 | 4.14 | 0.57 | 66.47-69.11 | 67.6 | 2.65-5.32 | 0.56 |
+| Weight | 140.78 | 18.36 | 2.60 | 137.33-150.66 | 144 | 13.4-23.7 | 2.44 |
+| Age | 19.25 | 2.54 | 0.36 | 19-21.29 | 20.1 | 2.23-3.87 | 0.39 |
+| Zombie Kills | 2.46 | 1.55 | 0.22 | 2.36-3.7 | 3.02 | 1.3-2.25 | 0.26 |
+| Years of Education | 2.94 | 1.75 | 0.25 | 2.36-3.96 | 3.03 | 1.33-2.12 | 0.26 |
 
 ### Step 8: Plot Sampling Distribution
 

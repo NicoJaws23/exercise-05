@@ -73,12 +73,12 @@ d70s <- d70s |>
 #Step 7: Compare these sampled means and the standard error
 #calculate the actual means, sd, and se of the population for each decade
 #reults data
-d20se <- 26.20133/sqrt(152)
-d30se <- 17.28879/sqrt(530)
-d40se <- 19.12372/sqrt(782)
-d50se <- 19.20646/sqrt(1081)
-d60se <- 21.23202/sqrt(1386)
-d70se <- 17.95934/sqrt(1720)
+d20se <- 26.20133/sqrt(100)
+d30se <- 17.28879/sqrt(100)
+d40se <- 19.12372/sqrt(100)
+d50se <- 19.20646/sqrt(100)
+d60se <- 21.23202/sqrt(100)
+d70se <- 17.95934/sqrt(100)
 #Step 8: Generating sampling distribution drawing 1000 random samples of 100 movies
 #by decade. Calculating the mean and sd in runtimeMinutes
 sampMetricsDecade <- function(df, variable, decadeVal, sampReps, sampNum){

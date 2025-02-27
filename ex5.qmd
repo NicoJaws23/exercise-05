@@ -1,5 +1,5 @@
 ---
-title: "ex5"
+title: "Exercise 5"
 format: html
 editor: visual
 ---
@@ -95,7 +95,7 @@ d70s <- movieSamp(d2, "70s", "runtimeMinutes", 100)
 
 ### Step 6: Calculate the Standard Error Based on Sample Population Mean
 
-Next we need to calculate the standard error of the population's mean runtimeMinutes based on the standard deviation from our sample of 100 movies. To do this, I created another function which takes the data set we want and the standard deviation variable in the data set to calculate the standard error. I then use the mutate() function to add a third column (runTimeSE) to each decades data frame holding these metrics
+Next we need to calculate the standard error of the population's mean runtimeMinutes based on the standard deviation from our sample of 100 movies. To do this, I created another function which takes the data set we want and the standard deviation variable in the data set to calculate the standard error. I then use the mutate() function to add a third column (runTimeSE) to each decades data frame holding these metrics. Each data frame now has 3 variables, runTimeMean, runTimeSD, and runTimeSE
 
 ```{r}
 #| message: false

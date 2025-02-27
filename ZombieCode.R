@@ -84,7 +84,7 @@ sampleSurvivors <- slice_sample(z, n = 50)
 metrics <- function(data, variable, lowCIBound, highCIBound){
   sampMean <- mean(data[[variable]])
   sampSD <- sd(data[[variable]])
-  sampSE <- sampSD/sqrt(length(data[[variable]]))
+  sampSE <- sampSD/sqrt(50)
   sampCI <- sampMean + qnorm(c(lowCIBound, highCIBound)) * sampSE
   print(paste(variable, "mean:", sampMean))
   print(paste(variable, "standard deviation:", sampSD))

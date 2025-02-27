@@ -122,27 +122,27 @@ d70s <- d70s |>
 
 ### Step 7: Compare Estimates of Population runtimeMinutes with the Sample of 100
 
-Below is a table listing the population and sample measurements of mean and standard deviation along with the sample standard error we calculated in step 6 . The means and standard deviation of the population are fairly similar, with some variation in each decade. The standard error is low for each decade, indicating they are good estimates of the population. I used the following to calculate the population standard error: sd/sqrt(size)
+Below is a table listing the population and sample measurements of mean and standard deviation along with the sample standard error we calculated in step 6 . The means and standard deviation of the population are fairly similar, with some variation in each decade. The standard error is low for each decade, indicating they are good estimates of the population. I used the following to calculate the population standard error: sd/sqrt(100)
 
 ```{r}
 #| message: false
 #| warning: false
-d20se <- 26.20133/sqrt(152)
-d30se <- 17.28879/sqrt(530)
-d40se <- 19.12372/sqrt(782)
-d50se <- 19.20646/sqrt(1081)
-d60se <- 21.23202/sqrt(1386)
-d70se <- 17.95934/sqrt(1720)
+d20se <- 26.20133/sqrt(100)
+d30se <- 17.28879/sqrt(100)
+d40se <- 19.12372/sqrt(100)
+d50se <- 19.20646/sqrt(100)
+d60se <- 21.23202/sqrt(100)
+d70se <- 17.95934/sqrt(100)
 ```
 
 | Decade | PopMean | SampleMean | PopSD | SampleSD | PopSE | SampleSE |
 |--------|---------|------------|-------|----------|-------|----------|
-| 20s    | 96.3    | 97.7       | 26.2  | 27.1     | 2.13  | 2.71     |
-| 30s    | 90.3    | 90.5       | 17.3  | 18.6     | 0.75  | 1.86     |
-| 40s    | 97.3    | 97         | 19.1  | 17.6     | 0.68  | 1.76     |
-| 50s    | 98.9    | 99.7       | 19.2  | 18.7     | 0.58  | 1.87     |
-| 60s    | 105.6   | 106        | 21.2  | 22.6     | 057   | 2.26     |
-| 70s    | 103.8   | 102        | 18.0  | 17.2     | 0.43  | 1.72     |
+| 20s    | 96.3    | 97.7       | 26.2  | 27.1     | 2.62  | 2.71     |
+| 30s    | 90.3    | 90.5       | 17.3  | 18.6     | 1.72  | 1.86     |
+| 40s    | 97.3    | 97         | 19.1  | 17.6     | 1.91  | 1.76     |
+| 50s    | 98.9    | 99.7       | 19.2  | 18.7     | 1.92  | 1.87     |
+| 60s    | 105.6   | 106        | 21.2  | 22.6     | 2.12  | 2.26     |
+| 70s    | 103.8   | 102        | 18.0  | 17.2     | 1.79  | 1.72     |
 
 ### Step 8: Create Sampling Distribution
 
@@ -208,12 +208,12 @@ Below I have the standard error for each decade's sample, population, and sample
 
 | Decade | SampleSE | PopSE | SampleDistSE |
 |--------|----------|-------|--------------|
-| 20s    | 2.71     | 2.13  | 1.55         |
-| 30s    | 1.86     | 0.75  | 1.6          |
-| 40s    | 1.76     | 0.68  | 1.76         |
-| 50s    | 1.87     | 0.58  | 1.81         |
-| 60s    | 2.26     | 0.57  | 2.01         |
-| 70s    | 1.72     | 0.43  | 1.79         |
+| 20s    | 2.71     | 2.62  | 1.55         |
+| 30s    | 1.86     | 1.72  | 1.6          |
+| 40s    | 1.76     | 1.91  | 1.76         |
+| 50s    | 1.87     | 1.92  | 1.81         |
+| 60s    | 2.26     | 2.12  | 2.01         |
+| 70s    | 1.72     | 1.79  | 1.79         |
 
 # Challenge 2: Sampling Zombie Survivors
 
